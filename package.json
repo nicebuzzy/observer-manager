@@ -1,0 +1,30 @@
+{
+  "name": "@nicebuzzy/observer-manager",
+  "version": "1.0.0",
+  "description": "A simple observer manager that currently supports Mutation and Object observers.",
+  "keywords": [
+    "observer"
+  ],
+  "author": "nicebuzzy",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "browser": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicebuzzy/observer-manager.git"
+  },
+  "scripts": {
+    "test": "vitest --browser=chrome",
+    "build": "rollup --config"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "devDependencies": {
+    "@vitest/browser": "^3.0.4",
+    "rollup": "^4.32.0",
+    "vitest": "^3.0.4"
+  }
+}
