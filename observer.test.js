@@ -22,43 +22,59 @@ describe('MutationObserver', () => {
   const observer = manager.mutation()
 
   const any = vi.fn((mutation) => expect(mutation.type).toBeOneOf(['childList', 'attributes']))
-  const child = vi.fn((mutation) => expect(mutation.type).toBe('childList'))
+  const childList = vi.fn((mutation) => expect(mutation.type).toBe('childList'))
   const attributes = vi.fn((mutation) => expect(mutation.type).toBe('attributes'))
 
-  const target = document.body
+  const body = document.body
+  const div = document.createElement('div')
 
-  test('subscribe', () => {
-    observer.subscribe(target, any)
-    observer.subscribe(target, child, { childList: true })
-    observer.subscribe(target, attributes, { attributes: true })
+  test('subscribe', async () => {
+    observer.subscribe(body, any, { childList: true, attributes: true, subtree: true })
+    observer.subscribe(body, childList, { childList: true })
+    observer.subscribe(body, attributes, { attributes: true, subtree: false })
 
-    expect(observer.subscribers.has(target)).toBe(true)
-    expect(observer.subscribers.size).toBe(1)
-    expect(observer.subscribers.get(target).size).toBe(3)
+    observer.subscribe(div, any, { childList: true, attributes: true, subtree: false })
+    observer.subscribe(div, childList, { childList: true, subtree: true })
+    observer.subscribe(div, attributes, { attributes: true, subtree: true })
+
+    expect(observer.targets.size).toBe(2)
+    expect(observer.targets.has(body)).toBe(true)
+    expect(observer.targets.has(div)).toBe(true)
+    expect(observer.targets.get(body).size).toBe(3)
+    expect(observer.targets.get(div).size).toBe(3)
   })
 
   test('notify', async () => {
-    target.appendChild(document.createElement('foo'))
-    target.setAttribute('foo', 'bar')
+    body.appendChild(div) // any (body) + childList
+    body.setAttribute('foo', 'bar') // any (body) + attributes (body)
+
+    div.appendChild(document.createElement('foo')) // any (body) + any (div) + childList (div)
+    div.setAttribute('foo', 'bar') // any (body) + any (div) + attributes (div)
+
+    div.querySelector('foo').appendChild(document.createElement('baz')) // any (body) + childList (div)
+    div.querySelector('baz').setAttribute('baz', 'qux') // any (body) + attributes (div)
 
     await vi.waitFor(() => {
-      expect(any).toHaveBeenCalledTimes(2)
-      expect(child).toHaveBeenCalledTimes(1)
-      expect(attributes).toHaveBeenCalledTimes(1)
+      expect(any).toHaveBeenCalledTimes(8)
+      expect(childList).toHaveBeenCalledTimes(3)
+      expect(attributes).toHaveBeenCalledTimes(3)
     })
   })
 
   test('unsubscribe', async () => {
-    observer.unsubscribe(target, any)
+    observer.unsubscribe(body, any)
 
-    expect(observer.subscribers.get(target).get(any)).toBeUndefined()
-    expect(observer.subscribers.get(target).size).toBe(2)
+    expect(observer.targets.get(body).get(any)).toBeUndefined()
+    expect(observer.targets.get(body).size).toBe(2)
 
-    observer.unsubscribe(target, child)
-    observer.unsubscribe(target, attributes)
+    observer.unsubscribe(body, childList)
+    observer.unsubscribe(body, attributes)
 
-    expect(observer.subscribers.has(target)).toBe(false)
-    expect(observer.subscribers.size).toBe(0)
+    expect(observer.targets.has(body)).toBe(false)
+    expect(observer.targets.size).toBe(1)
+
+    observer.clear()
+    expect(observer.targets.size).toBe(0)
   })
 })
 
@@ -80,8 +96,8 @@ describe('ObjectObserver', () => {
     observer.subscribe(target, set, { set: true })
     observer.subscribe(target, del, { del: true })
 
-    expect(observer.subscribers.has(target)).toBe(true)
-    expect(observer.subscribers.get(target).size).toBe(4)
+    expect(observer.targets.has(target)).toBe(true)
+    expect(observer.targets.get(target).size).toBe(4)
   })
 
   test('notify', () => {
@@ -101,14 +117,14 @@ describe('ObjectObserver', () => {
   test('unsubscribe', () => {
     observer.unsubscribe(target, any)
 
-    expect(observer.subscribers.get(target).get(any)).toBeUndefined()
-    expect(observer.subscribers.get(target).size).toBe(3)
+    expect(observer.targets.get(target).get(any)).toBeUndefined()
+    expect(observer.targets.get(target).size).toBe(3)
 
     observer.unsubscribe(target, get)
     observer.unsubscribe(target, set)
     observer.unsubscribe(target, del)
 
-    expect(observer.subscribers.has(target)).toBe(false)
-    expect(observer.subscribers.size).toBe(0)
+    expect(observer.targets.has(target)).toBe(false)
+    expect(observer.targets.size).toBe(0)
   })
 })

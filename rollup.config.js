@@ -1,24 +1,44 @@
-const outputs = [
-  ['index', 'ObserverManager'],
-  ['MutationObserverWrapper', 'MutationObserverWrapper'],
-  ['ObjectObserverWrapper', 'ObjectObserverWrapper']
-].map(([file, name]) => {
-  const outFile = file.toLowerCase()
-
-  return {
-    input: `src/${file}.js`,
+export default [
+  {
+    input: 'src/index.js',
     output: [
       {
-        file: `dist/${outFile}.js`,
+        file: 'dist/observer-manager.js',
         format: 'es'
       },
       {
-        file: `dist/${outFile}.umd.js`,
+        file: 'dist/observer-manager.umd.js',
         format: 'umd',
-        name: name
+        name: 'ObserverManager'
+      }
+    ]
+  },
+  {
+    input: 'src/MutationObserverWrapper.js',
+    output: [
+      {
+        file: 'dist/mutation-observer.js',
+        format: 'es'
+      },
+      {
+        file: 'dist/mutation-observer.umd.js',
+        format: 'umd',
+        name: 'ObserverManager'
+      }
+    ]
+  },
+  {
+    input: 'src/ObjectObserverWrapper.js',
+    output: [
+      {
+        file: 'dist/object-observer.js',
+        format: 'es'
+      },
+      {
+        file: 'dist/object-observer.umd.js',
+        format: 'umd',
+        name: 'ObserverManager'
       }
     ]
   }
-})
-
-export default outputs
+]

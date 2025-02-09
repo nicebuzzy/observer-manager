@@ -12,7 +12,7 @@ export default class ObjectObserverWrapper {
   }
 
   constructor() {
-    this.subscribers = new Map()
+    this.targets = new Map()
     this.proxies = new Map()
   }
 
@@ -65,23 +65,23 @@ export default class ObjectObserverWrapper {
   }
 
   subscribe(target, subscriber, options = this.defaultOptions) {
-    if (!this.subscribers.has(target)) {
-      this.subscribers.set(target, new Map())
+    if (!this.targets.has(target)) {
+      this.targets.set(target, new Map())
     }
 
-    this.subscribers.get(target).set(subscriber, options)
+    this.targets.get(target).set(subscriber, options)
   }
 
   unsubscribe(target, subscriber) {
-    if (!this.subscribers.has(target)) {
+    if (!this.targets.has(target)) {
       return
     }
 
-    const subscribers = this.subscribers.get(target)
+    const subscribers = this.targets.get(target)
     subscribers.delete(subscriber)
 
     if (subscribers.size === 0) {
-      this.subscribers.delete(target)
+      this.targets.delete(target)
       this.proxies.delete(target)
     }
   }
@@ -91,12 +91,12 @@ export default class ObjectObserverWrapper {
   }
 
   clear() {
-    this.subscribers.clear()
+    this.targets.clear()
   }
 
   notify(mutation) {
     const { target } = mutation
-    this.subscribers.get(target)?.forEach((options, subscriber) => {
+    this.targets.get(target)?.forEach((options, subscriber) => {
       this.shouldNotify(mutation, options) && subscriber(mutation)
     })
   }

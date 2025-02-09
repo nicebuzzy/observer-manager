@@ -1,6 +1,6 @@
 {
   "name": "@nicebuzzy/observer-manager",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A simple observer manager that currently supports Mutation and Object observers.",
   "keywords": [
     "observer"
