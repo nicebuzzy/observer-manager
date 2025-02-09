@@ -8,9 +8,9 @@
   "author": "nicebuzzy",
   "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "browser": "dist/index.js",
+  "main": "dist/observer-manager.js",
+  "module": "dist/observer-manager.js",
+  "browser": "dist/observer-manager.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nicebuzzy/observer-manager.git"
